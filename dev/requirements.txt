@@ -1,0 +1,3 @@
+PySide2
+setuptools
+git+https://github.com/shotgunsoftware/tk-core
