@@ -1,5 +1,7 @@
-# ---- ignore special files written during config setup
+# ---- ignore special files created for dev
+.venv
 
+# ---- ignore special files written during config setup
 core/app_store.yml
 core/install_location.yml
 core/interpreter_*.cfg
@@ -40,3 +42,4 @@ pip-log.txt
 # Jetbrains Pycharm
 .idea
 venv
+.venv/Lib/site-packages/pip/__main__.py

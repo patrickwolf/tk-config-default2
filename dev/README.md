@@ -9,9 +9,15 @@ The following steps are assumed to be executed from within the previously extrac
 ## 2. Setup virtualenv
 Then create a virtualenv with the shotgun python.
 ```
-c:\Program Files\Shotgun\Python3\python.exe -m venv .venv
+"c:\Program Files\Shotgun\Python3\python.exe" -m venv .venv
 ```
 Alternatively let VSCode create the .venv by directing it to the shotgun python executable.
+
+If you have issues with installing pip you can use this alternate steps
+"c:\Program Files\Shotgun\Python3\python.exe" -m venv --without-pip .venv
+.venv\Scripts\activate
+wget https://bootstrap.pypa.io/get-pip.py
+python get-pip.py
 
 ## 3. Install additional python libs
 
