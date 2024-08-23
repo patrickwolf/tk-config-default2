@@ -4,7 +4,7 @@
 # 
 primary:
   default: true
-  linux_path: /srv/fakenas/freelancing/shotgrid
+  linux_path: null
   mac_path: null
   shotgun_storage_id: 5
   windows_path: F:\shotgrid
