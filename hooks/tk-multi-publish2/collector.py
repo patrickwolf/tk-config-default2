@@ -86,3 +86,6 @@ class BasicSceneCollector(HookBaseClass):
                 logger.info(f'Successfully linked asset "{file_name}" to task "{new_ctx.task["name"]}"')
                 # we found a match, let's leave the
                 break
+
+        # store task information from filename for later use in upload_version
+        file_item.properties['task'] = task
