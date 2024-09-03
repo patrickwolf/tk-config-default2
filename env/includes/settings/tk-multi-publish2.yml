@@ -22,7 +22,7 @@ publish_help_url: &help_url "https://help.autodesk.com/view/SGSUB/ENU/?guid=SG_S
 # ---- Stand alone publish
 
 settings.tk-multi-publish2.standalone:
-  collector: "{self}/collector.py"
+  collector: "{self}/collector.py:{config}/tk-multi-publish2/collector.py"
   publish_plugins:
   - name: Publish to Flow Production Tracking
     hook: "{self}/publish_file.py"
