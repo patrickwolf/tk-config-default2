@@ -62,6 +62,9 @@ class UploadVersionPlugin(HookBaseClass):
         # --- begin customization
         if 'task' in item.properties:
             version_data["sg_version_type"] = item.properties['task']
+
+        if 'artist' in item.properties:
+            version_data["user"] = item.properties['artist']
         # --- end customization
 
         if settings["Link Local File"].value:
