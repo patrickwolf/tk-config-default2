@@ -20,6 +20,11 @@ class BasicFilePublishPlugin(HookBaseClass):
             "default": None,
             "description": "The artist that will be set on the task."
         }
+        settings["playlist"] = {
+            "type": "dict",
+            "default": None,
+            "description": "The playlist to which the version will be assigned to."
+        }
         return settings
 
 
@@ -33,7 +38,8 @@ class BasicFilePublishPlugin(HookBaseClass):
     def get_ui_settings(self, widget):
         # This will get called when the selection changes in the UI.
         # We need to gather the settings from the UI and return them
-        return {"artist": widget.artist}
+        return {"artist": widget.artist,
+                "playlist": widget.playlist}
 
 
     def set_ui_settings(self, widget, settings, items=None):
@@ -47,9 +53,15 @@ class BasicFilePublishPlugin(HookBaseClass):
             if (artist := setting_block.get("artist")):
                 widget.artist = artist
 
+            if (playlist := setting_block.get("playlist")):
+                widget.playlist = playlist
+
     def publish(self, settings, item):
         if (artist := settings.get("artist")):
             item.properties['artist'] = artist.value
+
+        if (playlist := settings.get("playlist")):
+            item.properties["playlist"] = playlist.value
 
         HookBaseClass.publish(self, settings, item)
 
@@ -63,6 +75,7 @@ class ReviewWidget(QtGui.QWidget):
         self._setup_ui()
 
         self._populate_artists(sg, self.artist_cmbx)
+        self._populate_playlists(sg, self.playlist_cmbx)
 
     @property
     def artist(self):
@@ -85,15 +98,38 @@ class ReviewWidget(QtGui.QWidget):
         index = self.artist_cmbx.findData(value)
         self.artist_cmbx.setCurrentIndex(index)
 
+    @property
+    def playlist(self):
+        """
+        Extract the Shotgun user data from the widget and return it.
+        Should return something like {u'type': u'HumanUser', u'id': 190, u'name': u'Bob'}.
+        :return: dict
+        """
+        index = self.playlist_cmbx.currentIndex()
+        return self.playlist_cmbx.itemData(index)
+
+    @playlist.setter
+    def playlist(self, value):
+        """
+        When passed the Shotgun user data, it looks up the combobox index that matches this data and
+        sets it to the current index.
+        :param value:
+        :return: Void
+        """
+        index = self.playlist_cmbx.findData(value)
+        self.playlist_cmbx.setCurrentIndex(index)
+
     def _setup_ui(self):
         """
         Creates and lays out all the Qt widgets
         :return:
         """
         self.artist_cmbx = QtGui.QComboBox()
+        self.playlist_cmbx = QtGui.QComboBox()
 
         layout = QtGui.QFormLayout()
         layout.addRow("Artist", self.artist_cmbx)
+        layout.addRow("Playlist", self.playlist_cmbx)
         self.setLayout(layout)
 
     def _populate_artists(self, sg, combobox):
@@ -124,3 +160,26 @@ class ReviewWidget(QtGui.QWidget):
         # Now add all the found users to the artist combo box.
         for artist in artists:
             combobox.addItem(artist["name"], artist)
+
+    def _populate_playlists(self, sg, combobox):
+        """
+        Populate the playlist combobox with all the available playlists found on the project.
+        :param sg: Shotgun API instance
+        :param combobox: The QCombobox that should be populated with users.
+        :return: Void
+        """
+
+        # Get the current scene context
+        current_context = sgtk.platform.current_engine().context
+
+        # only find playlists assigned to the current project
+        project = ["project", "is", current_context.project]
+
+        playlists = sg.find("Playlist", filters=[project], fields=["id", "code"])
+
+        # Add an option so the user doesn't have to assign to someone.
+        combobox.addItem("---")
+
+        # Now add all the found users to the playlist combo box.
+        for playlist in playlists:
+            combobox.addItem(playlist["code"], playlist)

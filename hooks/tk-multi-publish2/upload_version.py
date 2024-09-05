@@ -65,6 +65,9 @@ class UploadVersionPlugin(HookBaseClass):
 
         if 'artist' in item.properties:
             version_data["user"] = item.properties['artist']
+
+        if 'playlist' in item.properties:
+            version_data["playlists"] = [item.properties['playlist']]
         # --- end customization
 
         if settings["Link Local File"].value:
