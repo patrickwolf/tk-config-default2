@@ -1,3 +1,7 @@
+# Copyright (c) 2024 Yeti Tools Software
+#
+# CONFIDENTIAL AND PROPRIETARY
+
 import os
 import pprint
 import sgtk
@@ -39,7 +43,7 @@ class UploadVersionPlugin(HookBaseClass):
             path_components = publisher.util.get_file_path_components(path)
             publish_name = path_components["filename"]
 
-        # --- begin customization
+        # --- Yeti - begin customization
         if publish_name.endswith('.mov'):
             publish_name = publish_name[:-4]
         # --- end customization
@@ -59,7 +63,7 @@ class UploadVersionPlugin(HookBaseClass):
             publish_data = item.properties["sg_publish_data"]
             version_data["published_files"] = [publish_data]
 
-        # --- begin customization
+        # --- Yeti - begin customization
         if (version_type := item.properties.get("version_type")):
             version_data["sg_version_type"] = version_type
 

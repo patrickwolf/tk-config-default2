@@ -1,3 +1,7 @@
+# Copyright (c) 2024 Yeti Tools Software
+#
+# CONFIDENTIAL AND PROPRIETARY
+
 import mimetypes
 import os
 import sgtk
@@ -43,18 +47,19 @@ class BasicSceneCollector(HookBaseClass):
             file_items = self._collect_folder(parent_item, path)
             for file_item in file_items:
                 file_item.properties["publish_templates"] = publish_templates
-                # --- begin customization
+                # --- Yeti - begin customization
                 self._link_item_to_task(file_item)
                 # --- end customization
             return None
         else:
             file_item = self._collect_file(parent_item, path)
             file_item.properties["publish_templates"] = publish_templates
-            # --- begin customization
+            # --- Yeti - begin customization
             self._link_item_to_task(file_item)
             # --- end customization
             return file_item
 
+    # --- Yeti - begin customization
     def _link_item_to_task(self, file_item):
         """
         This function will connect the file_item with a task if one is found

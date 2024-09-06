@@ -1,3 +1,7 @@
+# Copyright (c) 2024 Yeti Tools Software
+#
+# CONFIDENTIAL AND PROPRIETARY 
+
 import os
 import pprint
 import traceback
@@ -7,6 +11,7 @@ from sgtk.util.filesystem import copy_file, ensure_folder_exists
 from sgtk.platform.qt import QtGui, QtCore
 
 HookBaseClass = sgtk.get_hook_baseclass()
+
 
 class BasicFilePublishPlugin(HookBaseClass):
 
