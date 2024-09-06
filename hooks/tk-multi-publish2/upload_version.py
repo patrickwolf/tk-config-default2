@@ -60,14 +60,14 @@ class UploadVersionPlugin(HookBaseClass):
             version_data["published_files"] = [publish_data]
 
         # --- begin customization
-        if 'task' in item.properties:
-            version_data["sg_version_type"] = item.properties['task']
+        if (version_type := item.properties.get("version_type")):
+            version_data["sg_version_type"] = version_type
 
-        if 'artist' in item.properties:
-            version_data["user"] = item.properties['artist']
+        if (artist := item.properties.get("artist")):
+            version_data["user"] = artist
 
-        if 'playlist' in item.properties:
-            version_data["playlists"] = [item.properties['playlist']]
+        if (playlist := item.properties.get("playlist")):
+            version_data["playlists"] = [playlist]
         # --- end customization
 
         if settings["Link Local File"].value:

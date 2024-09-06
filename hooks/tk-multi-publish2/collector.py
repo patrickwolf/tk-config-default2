@@ -8,6 +8,12 @@ logger = sgtk.platform.get_logger(__name__)
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
+ACCEPTABLE_TYPES = [
+    "anim", "blocking", "comp", "concept", "cutref", "diwip", "dmp", "edit", "fx",
+    "layout", "light", "lookdev", "model", "optical", "plate", "postvis", "previs",
+    "reference", "scan", "techvis", "test", "wedge",
+]
+
 
 class BasicSceneCollector(HookBaseClass):
     """
@@ -54,38 +60,43 @@ class BasicSceneCollector(HookBaseClass):
         This function will connect the file_item with a task if one is found
         based on the filename.
         """
-        path = file_item.properties['path']
+        path = file_item.properties["path"]
         publisher = self.parent
+        sg = publisher.shotgun
 
         # get path components assuming the file structure is
         # single file:  LAX_0020_comp_v002.mov
         # sequence:     LAX_0020_comp_v002.%04d.exr
         # subtask:      LAX_0020_comp_pipe_v002.mov
-        file_name = publisher.util.get_file_path_components(path)['filename']
-        scene, shot, task, subtask, *rest = file_name.split('_')
+        file_name = publisher.util.get_file_path_components(path)["filename"]
+        scene, shot, task, subtask, *rest = file_name.split("_")
 
-        parts = [scene, shot, task]
+        project_id = file_item.context.project["id"]
         # if there is no subtask, the version and file extension are in subtask
         # an rest is empty. Therefore, if a rest is given, we have a subtask
-        if rest:
-            parts.append(subtask)
+        entity_name = "_".join(filter(None, [scene, shot, task, subtask if rest else None]))
+        response = sg.text_search(entity_name, {"Task": []}, [project_id])
 
-        task_str = '_'.join(parts)
+        if not response["matches"]:
+            # we did not find any tasks. search for a shot at least
+            entity_name = "_".join([scene, shot])
+            response = sg.text_search(entity_name, {"Shot": []}, [project_id])
 
-        project_id = file_item.context.project['id']
-        response = publisher.shotgun.text_search(task_str, {'Task': []}, [project_id])
-        matches = response['matches']
-
-        # we can only link a task if the matches are unambiguous
-        for match in matches:
-            if match['name'] == task_str:
-                task_id = matches[0]['id']
-                new_ctx = publisher.sgtk.context_from_entity('Task', task_id)
+        # we can only link a task if the matches are unambiguous, therefore
+        # iterate over all of them and do a name matching
+        match = None
+        for match in response["matches"]:
+            if match["name"] == entity_name:
+                entity_type = match["type"]
+                entity_id = match["id"]
+                new_ctx = publisher.sgtk.context_from_entity(entity_type, entity_id)
                 file_item.context = new_ctx
 
-                logger.info(f'Successfully linked asset "{file_name}" to task "{new_ctx.task["name"]}"')
-                # we found a match, let's leave the
+                logger.info(f'Successfully linked asset "{file_name}" to {entity_type} "{entity_name}"')
+                # we found a match, let"s leave now
                 break
 
         # store task information from filename for later use in upload_version
-        file_item.properties['task'] = task
+        if match and match["type"] == "Task" or task in ACCEPTABLE_TYPES:
+            file_item.properties["version_type"] = task
+    # --- end customization
