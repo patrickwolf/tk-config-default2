@@ -173,13 +173,14 @@ class ReviewWidget(QtGui.QWidget):
         current_context = sgtk.platform.current_engine().context
 
         # only find playlists assigned to the current project
+        status = ["sg_playlist_status", "not_in", ("clsd", "dlvr", "cmpt")]
         project = ["project", "is", current_context.project]
 
-        playlists = sg.find("Playlist", filters=[project], fields=["id", "code"])
+        playlists = sg.find("Playlist", filters=[status, project], fields=["id", "code"])
 
         # Add an option so the user doesn't have to assign to someone.
         combobox.addItem("---")
 
         # Now add all the found users to the playlist combo box.
-        for playlist in playlists:
+        for playlist in sorted(playlists, key=lambda pl: pl["code"]):
             combobox.addItem(playlist["code"], playlist)
